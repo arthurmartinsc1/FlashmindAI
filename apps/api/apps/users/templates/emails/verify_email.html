@@ -1,0 +1,156 @@
+{% spaceless %}
+<!doctype html>
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{{ pin }} é seu código FlashMind</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Resets que rodam em clientes que aceitam <style> (Gmail, Apple Mail). */
+    body, table, td, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table, td { mso-table-lspace:0pt; mso-table-rspace:0pt; border-collapse:collapse; }
+    img { -ms-interpolation-mode:bicubic; border:0; outline:none; text-decoration:none; display:block; }
+    body { margin:0 !important; padding:0 !important; width:100% !important; }
+    a { color:#6366F1; }
+
+    /* Mobile (~480px) */
+    @media (max-width: 600px) {
+      .container { width:100% !important; border-radius:0 !important; }
+      .px { padding-left:24px !important; padding-right:24px !important; }
+      .pin-cell { font-size:34px !important; letter-spacing:8px !important; padding:18px 22px !important; }
+      .h1 { font-size:22px !important; }
+    }
+
+    /* Dark mode (Apple Mail, alguns Gmail). Outlook ignora. */
+    @media (prefers-color-scheme: dark) {
+      .bg-page { background:#0b0f17 !important; }
+      .bg-card { background:#111827 !important; }
+      .text-strong { color:#f8fafc !important; }
+      .text-body { color:#cbd5e1 !important; }
+      .text-muted { color:#94a3b8 !important; }
+      .pin-box { background:#1f2937 !important; }
+      .footer { background:#0b0f17 !important; border-color:#1f2937 !important; color:#64748b !important; }
+      .divider { border-color:#1f2937 !important; }
+    }
+  </style>
+</head>
+<body class="bg-page" style="margin:0;padding:0;background:#f4f5f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;">
+
+  <!-- Preheader (só aparece na lista de emails, não no corpo) -->
+  <div style="display:none;font-size:1px;color:#f4f5f8;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">
+    Use o código {{ pin }} para confirmar seu email no FlashMind. Expira em {{ ttl_minutes }} minutos.
+  </div>
+
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f4f5f8;" class="bg-page">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <!-- Card -->
+        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0"
+               class="container bg-card"
+               style="width:560px;max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(15,23,42,0.10);">
+
+          <!-- Header com gradient -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 50%,#A855F7 100%);padding:28px 36px;" class="px">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#ffffff;font-size:18px;font-weight:600;letter-spacing:-0.01em;">
+                    <span style="display:inline-block;width:30px;height:30px;background:rgba(255,255,255,0.18);border-radius:8px;text-align:center;line-height:30px;font-size:18px;vertical-align:middle;margin-right:10px;">🧠</span>
+                    <span style="vertical-align:middle;">FlashMind</span>
+                  </td>
+                  <td align="right" valign="middle" style="font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;color:rgba(255,255,255,0.85);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;">
+                    Verificação
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Saudação + título -->
+          <tr>
+            <td class="px text-strong" style="padding:36px 36px 8px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0f172a;">
+              <p style="margin:0 0 6px 0;font-size:14px;color:#64748b;" class="text-muted">Olá, {{ name }} 👋</p>
+              <h1 class="h1 text-strong" style="margin:0;font-size:26px;font-weight:700;letter-spacing:-0.02em;line-height:1.2;color:#0f172a;">
+                Confirme seu email
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Texto explicativo -->
+          <tr>
+            <td class="px text-body" style="padding:14px 36px 8px 36px;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;color:#475569;font-size:15px;line-height:1.6;">
+              Use o código de 6 dígitos abaixo para confirmar seu endereço de email e desbloquear sua conta:
+            </td>
+          </tr>
+
+          <!-- PIN box -->
+          <tr>
+            <td align="center" style="padding:24px 36px 8px 36px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td class="pin-box pin-cell"
+                      style="background:#f1f5f9;border-radius:14px;padding:22px 36px;font-family:'SFMono-Regular',Menlo,Monaco,Consolas,'Courier New',monospace;font-size:38px;font-weight:700;letter-spacing:14px;color:#0f172a;text-align:center;">
+                    {{ pin }}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- TTL -->
+          <tr>
+            <td align="center" class="text-muted" style="padding:6px 36px 30px 36px;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;color:#94a3b8;font-size:13px;">
+              ⏱  Expira em <strong style="color:#475569;">{{ ttl_minutes }} minutos</strong>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td class="px" style="padding:0 36px;">
+              <div class="divider" style="border-top:1px solid #e2e8f0;"></div>
+            </td>
+          </tr>
+
+          <!-- Aviso de segurança -->
+          <tr>
+            <td class="px text-muted" style="padding:24px 36px 28px 36px;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;color:#64748b;font-size:13px;line-height:1.6;">
+              <p style="margin:0 0 8px 0;">
+                <strong style="color:#475569;">Não solicitou esse código?</strong>
+              </p>
+              <p style="margin:0;">
+                Alguém pode ter digitado seu email por engano. Você pode ignorar este email com segurança — sem ação, nada acontece com sua conta.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="footer" style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:18px 36px;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;color:#94a3b8;font-size:12px;line-height:1.6;text-align:center;">
+              <p style="margin:0 0 4px 0;">FlashMind • Flashcards inteligentes que sabem o que você está prestes a esquecer</p>
+              <p style="margin:0;">Este é um email automático, não responda.</p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Card -->
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+{% endspaceless %}

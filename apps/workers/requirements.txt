@@ -1,0 +1,29 @@
+# Worker do FlashMind = mesmas deps da API (Django ORM + middlewares
+# referenciados em INSTALLED_APPS) + temporalio. Mantemos uma lista
+# explícita pra não depender da API durante o pip wheel.
+#
+# Para sincronizar: comparar com apps/api/requirements.txt periodicamente.
+
+# ─── Temporal (específico do worker) ─────────────────────────
+temporalio==1.7.1
+
+# ─── Django + extensões (idênticas à API) ────────────────────
+Django==4.2.16
+django-ninja==1.3.0
+django-cors-headers==4.4.0
+django-ratelimit==4.1.0
+django-environ==0.11.2
+djangorestframework-simplejwt==5.3.1
+PyJWT==2.9.0
+
+# ─── Database / Cache ────────────────────────────────────────
+psycopg[binary]==3.2.3
+redis==5.0.8
+hiredis==3.0.0
+
+# ─── HTTP client p/ Groq ──────────────────────────────────────
+httpx==0.27.2
+
+# ─── Observabilidade ─────────────────────────────────────────
+structlog==24.4.0
+sentry-sdk==2.14.0

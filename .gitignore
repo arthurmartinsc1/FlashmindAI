@@ -1,0 +1,133 @@
+# ────────────────────────────────────────────────────────────
+# Python / Django
+# ────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+apps/api/lib/
+apps/api/lib64/
+apps/workers/lib/
+apps/workers/lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
+.manifest
+.spec
+
+# virtualenvs
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static_root/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# ────────────────────────────────────────────────────────────
+# Node / Next.js
+# ────────────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+.vercel/
+.turbo/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ────────────────────────────────────────────────────────────
+# Flutter / Dart
+# ────────────────────────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/android/.gradle/
+**/android/captures/
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+
+# Generated Drift/Freezed files podem ser versionados ou não,
+# mantendo fora por padrão para evitar ruído em PRs.
+*.g.dart
+*.freezed.dart
+
+# ────────────────────────────────────────────────────────────
+# Editores / OS
+# ────────────────────────────────────────────────────────────
+.vscode/
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ────────────────────────────────────────────────────────────
+# Docker / Infra
+# ────────────────────────────────────────────────────────────
+*.pid
+*.sock
+
+# ────────────────────────────────────────────────────────────
+# Secrets / Env
+# ────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+*.pem
+*.key
+*.crt

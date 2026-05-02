@@ -1,0 +1,22 @@
+{% spaceless %}{% endspaceless %}FlashMind — Confirme seu email
+
+Olá, {{ name }}!
+
+Use o código de 6 dígitos abaixo para confirmar seu email
+e desbloquear sua conta no FlashMind:
+
+    {{ pin }}
+
+O código expira em {{ ttl_minutes }} minutos.
+
+──────────────────────────────────────────
+
+NÃO SOLICITOU ESSE CÓDIGO?
+Alguém pode ter digitado seu email por engano.
+Você pode ignorar este email com segurança — sem ação,
+nada acontece com sua conta.
+
+—
+FlashMind
+Flashcards inteligentes que sabem o que você está prestes a esquecer.
+Este é um email automático, não responda.

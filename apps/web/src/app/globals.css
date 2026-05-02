@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 6%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 6%;
+    --primary: 263 72% 50%;          /* roxo profundo — foco, inteligência */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 15%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 263 55% 95%;           /* roxo muito claro — hover states */
+    --accent-foreground: 263 72% 35%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 263 72% 50%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 8% 7%;
+    --foreground: 0 0% 97%;
+    --card: 240 7% 10%;
+    --card-foreground: 0 0% 97%;
+    --primary: 263 72% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 16%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 240 5% 16%;
+    --muted-foreground: 240 4% 64%;
+    --accent: 263 28% 18%;
+    --accent-foreground: 263 60% 82%;
+    --border: 240 5% 18%;
+    --input: 240 5% 18%;
+    --ring: 263 72% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    color: hsl(var(--primary));
+  }
+
+  /* tênue radial fade no topo — auth e hero */
+  .bg-radial-fade {
+    background: radial-gradient(
+      ellipse 70% 40% at 50% -10%,
+      hsl(263 72% 50% / 0.08),
+      transparent 70%
+    );
+  }
+}

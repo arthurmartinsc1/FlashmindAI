@@ -1,0 +1,55 @@
+# Reduz o build context que vai pro Docker daemon.
+# Aplicado quando context: . no docker-compose (caso do worker).
+
+# VCS
+.git
+.gitignore
+.github
+
+# IDE / OS
+.idea
+.vscode
+.cursor
+.DS_Store
+*.swp
+
+# Docs / config soltos
+*.md
+!apps/*/README.md
+PRD.md
+TechSpecs.md
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.venv
+**/venv
+**/htmlcov
+**/.coverage
+
+# Node
+**/node_modules
+**/.next
+**/.turbo
+**/npm-debug.log*
+
+# Flutter / Dart (mobile não vai pra container)
+apps/mobile
+
+# Docker / compose locais
+docker-compose*.yml
+.dockerignore
+
+# Env files (NUNCA copiar pra imagem)
+.env
+.env.*
+!.env.example
+
+# Build outputs
+**/build
+**/dist
+**/coverage
