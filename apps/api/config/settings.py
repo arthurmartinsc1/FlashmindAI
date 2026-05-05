@@ -71,6 +71,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "apps.core.middleware.TimingMiddleware",
+    "apps.core.middleware.CacheControlMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -126,6 +127,12 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": REDIS_URL,
+        "KEY_PREFIX": "fm",
+        "OPTIONS": {
+            "socket_connect_timeout": 5,
+            "socket_timeout": 5,
+            "retry_on_timeout": True,
+        },
     }
 }
 

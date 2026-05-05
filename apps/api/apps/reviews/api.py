@@ -5,8 +5,11 @@ import uuid
 from datetime import date
 from typing import Optional
 
+from django.core.cache import cache
+from django.utils import timezone
 from ninja import Query, Router
 
+from apps.core.cache import TTL_DUE, TTL_SUMMARY, due_cards_key, summary_key
 from apps.users.security import JWTAuth
 
 from .schemas import (
@@ -45,10 +48,17 @@ def due_cards(
     deck_id: Optional[uuid.UUID] = Query(None),
     limit: int = Query(50, ge=1, le=200),
 ):
+    key = due_cards_key(request.auth.pk, deck_id)
+    cached = cache.get(key)
+    if cached is not None:
+        return cached
+
     qs = list_due_cards(request.auth, deck_id=deck_id)
     total = qs.count()
     cards = list(qs[:limit])
-    return {"cards": cards, "total_due": total}
+    result = {"cards": cards, "total_due": total}
+    cache.set(key, result, timeout=TTL_DUE)
+    return result
 
 
 @review_router.get(
@@ -60,7 +70,14 @@ def summary(
     request,
     day: Optional[date] = Query(None, alias="date"),
 ):
-    return daily_summary(request.auth, day=day)
+    today = day or timezone.now().date()
+    key = summary_key(request.auth.pk, today)
+    cached = cache.get(key)
+    if cached is not None:
+        return cached
+    result = daily_summary(request.auth, day=day)
+    cache.set(key, result, timeout=TTL_SUMMARY)
+    return result
 
 
 # IMPORTANTE: esta rota com parâmetro dinâmico precisa ficar depois das

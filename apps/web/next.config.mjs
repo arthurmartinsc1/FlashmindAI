@@ -46,9 +46,31 @@ const nextConfig = {
   transpilePackages: ["react-markdown"],
   async headers() {
     return [
+      // Segurança em todas as rotas
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      // Assets do Next.js com hash no nome → imutáveis para sempre
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      // Imagens e arquivos públicos → 1 dia de cache
+      {
+        source: "/:file(.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|otf))",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=3600" },
+        ],
+      },
+      // Rotas de API Next.js (se houver) → sem cache
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "no-store" },
+        ],
       },
     ];
   },

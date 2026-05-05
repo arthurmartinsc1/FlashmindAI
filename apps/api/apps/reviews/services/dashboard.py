@@ -4,10 +4,12 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Optional
 
+from django.core.cache import cache
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 
+from apps.core.cache import TTL_DASHBOARD, dashboard_key
 from apps.decks.models import Card
 from apps.reviews.models import Review
 from apps.reviews.services.review import queryset_exclude_microlesson_gate
@@ -29,11 +31,9 @@ def _range(user: User, start: date, end_exclusive: date):
     )
 
 
-def build_dashboard(user: User, *, today: Optional[date] = None) -> dict:
-    today = today or timezone.now().date()
+def _build_dashboard_uncached(user: User, today: date) -> dict:
     tomorrow = today + timedelta(days=1)
 
-    # ─── Due cards ───────────────────────────────────────────
     due_today = queryset_exclude_microlesson_gate(
         Card.objects.filter(
             deck__user=user, deck__is_archived=False, next_review__lte=today
@@ -41,31 +41,22 @@ def build_dashboard(user: User, *, today: Optional[date] = None) -> dict:
         user,
     ).count()
 
-    # ─── Reviews por janela ──────────────────────────────────
     reviewed_today = _range(user, today, tomorrow).count()
     reviewed_week = _range(user, today - timedelta(days=6), tomorrow).count()
     reviewed_month = _range(user, today - timedelta(days=29), tomorrow).count()
 
-    # ─── Retenção (últimos 30 dias): % com quality >= 3 ──────
     last_30 = _range(user, today - timedelta(days=29), tomorrow)
     total_30 = last_30.count()
     correct_30 = last_30.filter(quality__gte=3).count()
     retention_rate = round((correct_30 / total_30) * 100, 1) if total_30 else 0.0
 
-    # ─── Streak (vem do UserProgress) ────────────────────────
     progress, _ = UserProgress.objects.get_or_create(user=user)
     current_streak = progress.current_streak
     longest_streak = progress.longest_streak
 
-    # Proteção: se o último review foi antes de ontem, a streak atual
-    # precisa ser considerada quebrada (o usuário não revisou hoje nem
-    # ontem), mesmo que o banco ainda mostre o valor antigo.
-    if progress.last_review_date and progress.last_review_date < today - timedelta(
-        days=1
-    ):
+    if progress.last_review_date and progress.last_review_date < today - timedelta(days=1):
         current_streak = 0
 
-    # ─── Heatmap dos últimos 30 dias ─────────────────────────
     grouped = (
         _range(user, today - timedelta(days=29), tomorrow)
         .annotate(day=TruncDate("reviewed_at"))
@@ -74,11 +65,10 @@ def build_dashboard(user: User, *, today: Optional[date] = None) -> dict:
     )
     by_day = {row["day"]: row["count"] for row in grouped}
     activity = [
-        {"date": today - timedelta(days=i), "count": by_day.get(today - timedelta(days=i), 0)}
+        {"date": (today - timedelta(days=i)).isoformat(), "count": by_day.get(today - timedelta(days=i), 0)}
         for i in range(29, -1, -1)
     ]
 
-    # ─── Distribuição de cards ───────────────────────────────
     card_qs = Card.objects.filter(deck__user=user, deck__is_archived=False)
     distribution_rows = card_qs.aggregate(
         new=Count("id", filter=Q(repetitions=0)),
@@ -100,3 +90,13 @@ def build_dashboard(user: User, *, today: Optional[date] = None) -> dict:
         "activity_last_30_days": activity,
         "card_distribution": distribution_rows,
     }
+
+
+def build_dashboard(user: User, *, today: Optional[date] = None) -> dict:
+    today = today or timezone.now().date()
+    key = dashboard_key(user.pk)
+    result = cache.get(key)
+    if result is None:
+        result = _build_dashboard_uncached(user, today)
+        cache.set(key, result, timeout=TTL_DASHBOARD)
+    return result

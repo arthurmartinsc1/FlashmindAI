@@ -10,6 +10,7 @@ from django.db import transaction
 from django.db.models import Exists, OuterRef, QuerySet
 from django.utils import timezone
 
+from apps.core.cache import invalidate_user
 from apps.decks.models import Card
 from apps.microlearning.models import MicroLesson, UserLessonCompletion
 from apps.reviews.models import Review
@@ -172,6 +173,9 @@ def submit_review(
         next_review=str(result.next_review),
         time_spent_ms=time_spent_ms,
     )
+
+    # Invalida dashboard e due-cards em background após commit.
+    transaction.on_commit(lambda: invalidate_user(user.pk))
 
     return card, review, result
 

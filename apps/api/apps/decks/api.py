@@ -4,9 +4,21 @@ from __future__ import annotations
 import uuid
 from typing import Optional
 
+from django.core.cache import cache
 from ninja import File, Query, Router
 from ninja.files import UploadedFile
 
+from apps.core.cache import (
+    TTL_CARDS,
+    TTL_DECK,
+    TTL_DECKS,
+    TTL_PUBLIC,
+    cards_key,
+    deck_key,
+    decks_key,
+    invalidate_user,
+    public_decks_key,
+)
 from apps.jobs.schemas import AsyncJobOut, GenerateCardsIn
 from apps.jobs.services import JobError, enqueue_generate_cards
 from apps.users.security import JWTAuth
@@ -44,9 +56,6 @@ from .services import (
 
 jwt_auth = JWTAuth()
 
-# Routers separados pra manter semântica do contrato do PRD:
-#   /decks/...            → operações sobre decks + cards nested em decks
-#   /cards/{id}           → operações diretas sobre um card
 decks_router = Router(tags=["Decks"], auth=jwt_auth)
 cards_router = Router(tags=["Cards"], auth=jwt_auth)
 
@@ -65,15 +74,22 @@ def list_decks(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
+    key = decks_key(request.auth.pk, search, limit, offset)
+    cached = cache.get(key)
+    if cached is not None:
+        return cached
+
     qs = list_user_decks(request.auth, search=search).order_by("-updated_at")
     items, total = paginate(qs, limit, offset)
     effective_limit, effective_offset = page_bounds(limit, offset)
-    return {
-        "decks": items,
+    result = {
+        "decks": list(items),
         "count": total,
         "limit": effective_limit,
         "offset": effective_offset,
     }
+    cache.set(key, result, timeout=TTL_DECKS)
+    return result
 
 
 @decks_router.get(
@@ -87,15 +103,22 @@ def list_public(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
+    key = public_decks_key(search, limit, offset)
+    cached = cache.get(key)
+    if cached is not None:
+        return cached
+
     qs = list_public_decks(search=search).order_by("-updated_at")
     items, total = paginate(qs, limit, offset)
     effective_limit, effective_offset = page_bounds(limit, offset)
-    return {
+    result = {
         "decks": items,
         "count": total,
         "limit": effective_limit,
         "offset": effective_offset,
     }
+    cache.set(key, result, timeout=TTL_PUBLIC)
+    return result
 
 
 @decks_router.post(
@@ -108,6 +131,7 @@ def create(request, payload: DeckIn):
         deck = create_deck(request.auth, payload.dict())
     except ValidationError as exc:
         return 400, {"detail": exc.detail}
+    invalidate_user(request.auth.pk)
     return 201, deck
 
 
@@ -117,10 +141,16 @@ def create(request, payload: DeckIn):
     summary="Detalhe do deck (próprio ou público).",
 )
 def retrieve(request, deck_id: uuid.UUID):
+    key = deck_key(request.auth.pk, deck_id)
+    cached = cache.get(key)
+    if cached is not None:
+        return 200, cached
+
     try:
         deck = get_deck_for_read(request.auth, deck_id)
     except ValidationError as exc:
         return 404, {"detail": exc.detail}
+    cache.set(key, deck, timeout=TTL_DECK)
     return 200, deck
 
 
@@ -135,6 +165,7 @@ def update(request, deck_id: uuid.UUID, payload: DeckUpdateIn):
         deck = update_deck(deck, payload.dict(exclude_unset=True))
     except ValidationError as exc:
         return 404, {"detail": exc.detail}
+    invalidate_user(request.auth.pk)
     return 200, deck
 
 
@@ -149,6 +180,7 @@ def destroy(request, deck_id: uuid.UUID):
     except ValidationError as exc:
         return 404, {"detail": exc.detail}
     archive_deck(deck)
+    invalidate_user(request.auth.pk)
     return 204, None
 
 
@@ -172,15 +204,22 @@ def list_deck_cards(
     except ValidationError as exc:
         return 404, {"detail": exc.detail}
 
+    key = cards_key(request.auth.pk, deck_id, search, limit, offset)
+    cached = cache.get(key)
+    if cached is not None:
+        return 200, cached
+
     qs = list_cards(deck, search=search).order_by("-created_at")
     items, total = paginate(qs, limit, offset)
     effective_limit, effective_offset = page_bounds(limit, offset)
-    return 200, {
+    result = {
         "cards": items,
         "count": total,
         "limit": effective_limit,
         "offset": effective_offset,
     }
+    cache.set(key, result, timeout=TTL_CARDS)
+    return 200, result
 
 
 @decks_router.post(
@@ -193,9 +232,9 @@ def create_card_view(request, deck_id: uuid.UUID, payload: CardIn):
         deck = get_deck_for_write(request.auth, deck_id)
         card = create_card(deck, payload.dict(), user=request.auth)
     except ValidationError as exc:
-        # PRD: limite excedido = erro de negócio (400). Not found = 404.
         status = 404 if "não encontrado" in exc.detail.lower() else 400
         return status, {"detail": exc.detail}
+    invalidate_user(request.auth.pk)
     return 201, card
 
 
@@ -239,6 +278,7 @@ def import_cards(
     except ValidationError as exc:
         status = 404 if "não encontrado" in exc.detail.lower() else 400
         return status, {"detail": exc.detail}
+    invalidate_user(request.auth.pk)
     return 201, {"imported_count": imported, "skipped_count": skipped}
 
 
@@ -256,6 +296,7 @@ def update_card_view(request, card_id: uuid.UUID, payload: CardUpdateIn):
         card = update_card(card, payload.dict(exclude_unset=True))
     except ValidationError as exc:
         return 404, {"detail": exc.detail}
+    invalidate_user(request.auth.pk)
     return 200, card
 
 
@@ -270,4 +311,5 @@ def delete_card_view(request, card_id: uuid.UUID):
     except ValidationError as exc:
         return 404, {"detail": exc.detail}
     delete_card(card)
+    invalidate_user(request.auth.pk)
     return 204, None

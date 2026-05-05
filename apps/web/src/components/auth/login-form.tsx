@@ -95,7 +95,7 @@ export function LoginForm() {
             </p>
           )}
 
-          <Button type="submit" className="w-full" disabled={mutation.isPending}>
+          <Button type="submit" className="w-full gap-2" disabled={mutation.isPending}>
             {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             {mutation.isPending ? "Entrando…" : "Entrar"}
           </Button>
